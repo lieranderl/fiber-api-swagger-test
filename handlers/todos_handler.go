@@ -74,7 +74,7 @@ func CreateTodo(c *fiber.Ctx) error {
 // @Failure		401	{object}	models.ErrorResponse
 // @Failure		403	{object}	models.ErrorResponse
 // @Failure		500	{object}	models.ErrorResponse
-// @Router			/v1/todo/{id} [put]
+// @Router			/v1/todos/{id} [put]
 func UpdateTodoByID(c *fiber.Ctx) error {
 	// Make a context for the request with a timeout of 10 seconds.
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -132,7 +132,7 @@ func UpdateTodoByID(c *fiber.Ctx) error {
 // @Failure		401	{object}	models.ErrorResponse
 // @Failure		403	{object}	models.ErrorResponse
 // @Failure		500	{object}	models.ErrorResponse
-// @Router			/v1/todo/{id} [delete]
+// @Router			/v1/todos/{id} [delete]
 func DeleteTodoByID(c *fiber.Ctx) error {
 	// Make a context for the request with a timeout of 10 seconds.
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -176,7 +176,7 @@ func DeleteTodoByID(c *fiber.Ctx) error {
 // @Failure		401	{object}	models.ErrorResponse
 // @Failure		403	{object}	models.ErrorResponse
 // @Failure		500	{object}	models.ErrorResponse
-// @Router			/v1/todo/{id} [get]
+// @Router			/v1/todos/{id} [get]
 func GetTodoByID(c *fiber.Ctx) error {
 	// Make a context for the request with a timeout of 10 seconds.
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

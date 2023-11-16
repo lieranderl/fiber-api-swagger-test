@@ -14,9 +14,9 @@ func TodoRoutes(a *fiber.App) {
 	// Create routes group.
 	route := a.Group(swagger_docs_v1.SwaggerInfo.BasePath + "/v1")
 
-	route.Get("/todos", middleware.AuthTokenMiddleware(), handlers.GetTodos)             // get list todo
-	route.Post("/todos", middleware.AuthTokenMiddleware(), handlers.CreateTodo)          // create new todo
-	route.Get("/todo/:id", middleware.AuthTokenMiddleware(), handlers.GetTodoByID)       // get todo by ID
-	route.Put("/todo/:id", middleware.AuthTokenMiddleware(), handlers.UpdateTodoByID)    // update one todo by ID
-	route.Delete("/todo/:id", middleware.AuthTokenMiddleware(), handlers.DeleteTodoByID) // delete one todo by ID
+	route.Get("/todos", middleware.AuthTokenMiddleware(), handlers.GetTodos)              // get list todo
+	route.Post("/todos", middleware.AuthTokenMiddleware(), handlers.CreateTodo)           // create new todo
+	route.Get("/todos/:id", middleware.AuthTokenMiddleware(), handlers.GetTodoByID)       // get todo by ID
+	route.Put("/todos/:id", middleware.AuthTokenMiddleware(), handlers.UpdateTodoByID)    // update one todo by ID
+	route.Delete("/todos/:id", middleware.AuthTokenMiddleware(), handlers.DeleteTodoByID) // delete one todo by ID
 }
