@@ -8,11 +8,11 @@ import (
 type TodoBody struct {
 	Title     string `json:"title,omitempty" bson:"title"`
 	Completed bool   `json:"completed" bson:"completed"`
-	User      string `json:"user,omitempty" bson:"user"`
 }
 
 type TodoId struct {
-	Id primitive.ObjectID `json:"id" bson:"_id"`
+	Id   primitive.ObjectID `json:"id" bson:"_id"`
+	User string             `json:"user,omitempty" bson:"user"`
 }
 
 type Todo struct {
@@ -27,6 +27,5 @@ type Todo struct {
 func (t *Todo) FetchFromBody(todoBody TodoBody) {
 	t.Title = todoBody.Title
 	t.Completed = todoBody.Completed
-	t.User = todoBody.User
 	t.Updated_time = time.Now()
 }

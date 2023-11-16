@@ -20,14 +20,7 @@ func SwaggerConfig() swagger.Config {
 	return swagger.Config{
 		DeepLinking: false,
 		// Expand ("list") or Collapse ("none") tag groups by default
-		DocExpansion: "list",
-
-		// Prefill OAuth ClientId on Authorize popup
-		OAuth: &swagger.OAuthConfig{
-			AppName:  "OAuth Provider",
-			ClientId: "21bb4edc-05a7-4afc-86f1-2e151e4ba6e2",
-		},
-		// Ability to change OAuth2 redirect uri location
-		OAuth2RedirectUrl: "http://" + os.Getenv("SERVER_HOST") + ":" + os.Getenv("SERVER_PORT") + "/swagger/oauth2-redirect.html",
+		DocExpansion:         "list",
+		PersistAuthorization: true,
 	}
 }

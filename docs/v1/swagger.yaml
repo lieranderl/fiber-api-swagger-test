@@ -27,12 +27,12 @@ definitions:
         type: boolean
       title:
         type: string
-      user:
-        type: string
     type: object
   models.TodoId:
     properties:
       id:
+        type: string
+      user:
         type: string
     type: object
 info:
@@ -43,6 +43,43 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 paths:
+  /v1/auth/github/callback:
+    get:
+      consumes:
+      - application/json
+      description: Github Callback
+      parameters:
+      - description: code
+        in: query
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TodoId'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Github Callback
+      tags:
+      - Auth
   /v1/todo/{id}:
     delete:
       consumes:
@@ -115,6 +152,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Get todo by ID
       tags:
       - Todo
@@ -192,6 +231,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Get a list of Todos
       tags:
       - Todo

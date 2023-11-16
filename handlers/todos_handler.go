@@ -12,19 +12,19 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// @Summary		Create a new Todo
-// @Description	Create a new todo item
-// @Tags			Todo
-// @Accept			json
-// @Produce		json
-// @Param			todo	body	models.TodoBody	true	"Todo object that needs to be created"
-// @Security		BearerAuth
-// @Success		200	{object}	models.TodoId
-// @Failure		400	{object}	models.ErrorResponse
-// @Failure		401	{object}	models.ErrorResponse
-// @Failure		403	{object}	models.ErrorResponse
-// @Failure		500	{object}	models.ErrorResponse
-// @Router			/v1/todos [post]
+//	@Summary		Create a new Todo
+//	@Description	Create a new todo item
+//	@Tags			Todo
+//	@Accept			json
+//	@Produce		json
+//	@Param			todo	body	models.TodoBody	true	"Todo object that needs to be created"
+//	@Security		BearerAuth
+//	@Success		200	{object}	models.TodoId
+//	@Failure		400	{object}	models.ErrorResponse
+//	@Failure		401	{object}	models.ErrorResponse
+//	@Failure		403	{object}	models.ErrorResponse
+//	@Failure		500	{object}	models.ErrorResponse
+//	@Router			/v1/todos [post]
 func CreateTodo(c *fiber.Ctx) error {
 	// Make a context for the request with a timeout of 10 seconds.
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -42,6 +42,7 @@ func CreateTodo(c *fiber.Ctx) error {
 	// Make a new todo
 	todo := new(models.Todo)
 	todo.FetchFromBody(*todo_body)
+	todo.User = c.Locals("user").(string)
 	todo.Created_time = time.Now()
 	// Save the todo to the mongo database
 	todosCollection := configs.GetCollection(configs.DB, "todos")
@@ -60,20 +61,20 @@ func CreateTodo(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(todoID)
 }
 
-// @Summary		Update a Todo
-// @Description	Update a todo item
-// @Tags			Todo
-// @Accept			json
-// @Produce		json
-// @Param			id		path	string			true	"Todo ID"
-// @Param			todo	body	models.TodoBody	true	"Todo object that needs to be updated"
-// @Security		BearerAuth
-// @Success		200	{object}	models.TodoId
-// @Failure		400	{object}	models.ErrorResponse
-// @Failure		401	{object}	models.ErrorResponse
-// @Failure		403	{object}	models.ErrorResponse
-// @Failure		500	{object}	models.ErrorResponse
-// @Router			/v1/todo/{id} [put]
+//	@Summary		Update a Todo
+//	@Description	Update a todo item
+//	@Tags			Todo
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path	string			true	"Todo ID"
+//	@Param			todo	body	models.TodoBody	true	"Todo object that needs to be updated"
+//	@Security		BearerAuth
+//	@Success		200	{object}	models.TodoId
+//	@Failure		400	{object}	models.ErrorResponse
+//	@Failure		401	{object}	models.ErrorResponse
+//	@Failure		403	{object}	models.ErrorResponse
+//	@Failure		500	{object}	models.ErrorResponse
+//	@Router			/v1/todo/{id} [put]
 func UpdateTodoByID(c *fiber.Ctx) error {
 	// Make a context for the request with a timeout of 10 seconds.
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -82,6 +83,7 @@ func UpdateTodoByID(c *fiber.Ctx) error {
 	todoID := new(models.TodoId)
 	objId, _ := primitive.ObjectIDFromHex(c.Params("id"))
 	todoID.Id = objId
+	todoID.User = c.Locals("user").(string)
 	// Create a new TodoBody struct.
 	todo_body := new(models.TodoBody)
 	// Parse body into TodoBody struct
@@ -95,6 +97,7 @@ func UpdateTodoByID(c *fiber.Ctx) error {
 	// Make a new todo
 	todo := new(models.Todo)
 	todo.FetchFromBody(*todo_body)
+	todo.User = c.Locals("user").(string)
 	// Save the todo to the mongo database
 	todosCollection := configs.GetCollection(configs.DB, "todos")
 	result, err := todosCollection.UpdateOne(ctx, todoID, bson.M{"$set": todo})
@@ -117,19 +120,19 @@ func UpdateTodoByID(c *fiber.Ctx) error {
 	}
 }
 
-// @Summary		Delete a Todo
-// @Description	Delete a todo item
-// @Tags			Todo
-// @Accept			json
-// @Produce		json
-// @Param			id	path	string	true	"Todo ID"
-// @Security		BearerAuth
-// @Success		200	{object}	string
-// @Failure		400	{object}	models.ErrorResponse
-// @Failure		401	{object}	models.ErrorResponse
-// @Failure		403	{object}	models.ErrorResponse
-// @Failure		500	{object}	models.ErrorResponse
-// @Router			/v1/todo/{id} [delete]
+//	@Summary		Delete a Todo
+//	@Description	Delete a todo item
+//	@Tags			Todo
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path	string	true	"Todo ID"
+//	@Security		BearerAuth
+//	@Success		200	{object}	string
+//	@Failure		400	{object}	models.ErrorResponse
+//	@Failure		401	{object}	models.ErrorResponse
+//	@Failure		403	{object}	models.ErrorResponse
+//	@Failure		500	{object}	models.ErrorResponse
+//	@Router			/v1/todo/{id} [delete]
 func DeleteTodoByID(c *fiber.Ctx) error {
 	// Make a context for the request with a timeout of 10 seconds.
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -138,6 +141,7 @@ func DeleteTodoByID(c *fiber.Ctx) error {
 	todoID := new(models.TodoId)
 	objId, _ := primitive.ObjectIDFromHex(c.Params("id"))
 	todoID.Id = objId
+	todoID.User = c.Locals("user").(string)
 	// Save the todo to the mongo database
 	todosCollection := configs.GetCollection(configs.DB, "todos")
 	result, err := todosCollection.DeleteOne(ctx, todoID)
@@ -160,18 +164,19 @@ func DeleteTodoByID(c *fiber.Ctx) error {
 	}
 }
 
-// @Summary		Get todo by ID
-// @Description	Get todo by ID
-// @Tags			Todo
-// @Accept			json
-// @Produce		json
-// @Param			id	path		string	true	"Todo ID"
-// @Success		200	{object}	models.Todo
-// @Failure		400	{object}	models.ErrorResponse
-// @Failure		401	{object}	models.ErrorResponse
-// @Failure		403	{object}	models.ErrorResponse
-// @Failure		500	{object}	models.ErrorResponse
-// @Router			/v1/todo/{id} [get]
+//	@Summary		Get todo by ID
+//	@Description	Get todo by ID
+//	@Tags			Todo
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path	string	true	"Todo ID"
+//	@Security		BearerAuth
+//	@Success		200	{object}	models.Todo
+//	@Failure		400	{object}	models.ErrorResponse
+//	@Failure		401	{object}	models.ErrorResponse
+//	@Failure		403	{object}	models.ErrorResponse
+//	@Failure		500	{object}	models.ErrorResponse
+//	@Router			/v1/todo/{id} [get]
 func GetTodoByID(c *fiber.Ctx) error {
 	// Make a context for the request with a timeout of 10 seconds.
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -180,6 +185,7 @@ func GetTodoByID(c *fiber.Ctx) error {
 	todoID := new(models.TodoId)
 	objId, _ := primitive.ObjectIDFromHex(c.Params("id"))
 	todoID.Id = objId
+	todoID.User = c.Locals("user").(string)
 	// Make a new todo
 	todo := new(models.Todo)
 	// Get the todo from the mongo database, decode to the todo struct
@@ -196,24 +202,25 @@ func GetTodoByID(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(todo)
 }
 
-// @Summary		Get a list of Todos
-// @Description	Get a list of Todos
-// @Tags			Todo
-// @Accept			json
-// @Produce		json
-// @Success		200	{object}	[]models.Todo
-// @Failure		400	{object}	models.ErrorResponse
-// @Failure		401	{object}	models.ErrorResponse
-// @Failure		403	{object}	models.ErrorResponse
-// @Failure		500	{object}	models.ErrorResponse
-// @Router			/v1/todos [get]
+//	@Summary		Get a list of Todos
+//	@Description	Get a list of Todos
+//	@Tags			Todo
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Success		200	{object}	[]models.Todo
+//	@Failure		400	{object}	models.ErrorResponse
+//	@Failure		401	{object}	models.ErrorResponse
+//	@Failure		403	{object}	models.ErrorResponse
+//	@Failure		500	{object}	models.ErrorResponse
+//	@Router			/v1/todos [get]
 func GetTodos(c *fiber.Ctx) error {
 	// Make a context for the request with a timeout of 10 seconds.
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	// Find command and returns a Cursor over the matching documents in the collection.
 	todosCollection := configs.GetCollection(configs.DB, "todos")
-	cur, err := todosCollection.Find(ctx, bson.D{})
+	cur, err := todosCollection.Find(ctx, bson.M{"user": c.Locals("user").(string)})
 	// Check for errors
 	if err != nil {
 		fiberlog.Error(err)

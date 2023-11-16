@@ -31,7 +31,10 @@ func main() {
 	// Routes.
 	routes.SwaggerRoute(app)  // Register a route for API Docs (Swagger).
 	routes.TodoRoutes(app)    // Register a todo routes.
-	routes.NotFoundRoute(app) // Register route for 404 Error.
+	routes.AuthCallbacks(app) // Register a auth callback routes.
+
+	// Register a route for 404 Error.
+	routes.NotFoundRoute(app)
 
 	// Start server (with or without graceful shutdown).
 	if os.Getenv("STAGE_STATUS") == "dev" {
