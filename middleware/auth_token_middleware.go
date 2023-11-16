@@ -3,21 +3,17 @@ package middleware
 import (
 	"general/fiber-swagger/models"
 
-	fiberlog "github.com/gofiber/fiber/v2/log"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
 )
 
-const apiKey = "123456789"
+const apiKey = "1234"
 
 func AuthTokenMiddleware() func(*fiber.Ctx) error {
 	// Create config for Bearer authentication middleware.
 	config := keyauth.Config{
 		AuthScheme: "Bearer",
 		Validator: func(c *fiber.Ctx, key string) (bool, error) {
-			fiberlog.Debug("key: ", key)
-
 			if key == apiKey {
 				return true, nil
 			}
