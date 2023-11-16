@@ -39,9 +39,12 @@ func AuthTokenMiddleware() func(*fiber.Ctx) error {
 			}
 
 			// if token is not in db, get user id from github and save to db
-			request := fiber.Get("https://api.github.com/user")
-			request.Debug()
-			request.Set("Accept", "application/json").Set("Content-Type", "application/json").Set("Authorization", "Bearer "+key)
+			request := fiber.
+				Get("https://api.github.com/user").
+				Debug().
+				Set("Accept", "application/json").
+				Set("Content-Type", "application/json").
+				Set("Authorization", "Bearer "+key)
 			statusCode, body, errs := request.Bytes()
 			// Check for errors
 			if errs != nil {
@@ -53,11 +56,11 @@ func AuthTokenMiddleware() func(*fiber.Ctx) error {
 				json_resp := make(map[string]interface{})
 				json.Unmarshal(body, &json_resp)
 				user = json_resp["login"].(string)
-				token_record.User = user
-				token_record.AcessTokenHash = access_token_hash
-				token_record.Created_time = time.Now()
 				fiberlog.Debug(user)
 				if user != "" {
+					token_record.User = user
+					token_record.AcessTokenHash = access_token_hash
+					token_record.Created_time = time.Now()
 					_, err := tokensCollection.InsertOne(c.Context(), token_record)
 					c.Locals("user", user)
 					// Check for errors
@@ -68,7 +71,6 @@ func AuthTokenMiddleware() func(*fiber.Ctx) error {
 					return true, nil
 				}
 			}
-
 			return false, keyauth.ErrMissingOrMalformedAPIKey
 		},
 		ErrorHandler: func(c *fiber.Ctx, err error) error {

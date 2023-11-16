@@ -34,11 +34,12 @@ func GithubCallback(c *fiber.Ctx) error {
 	// state := c.Query("state")
 	fiberlog.Debug(code)
 	// get access token from github
-	request := fiber.Post("https://github.com/login/oauth/access_token")
-	request.Debug()
-	request.Set("Accept", "application/json")
-	request.Set("Content-Type", "application/json")
-	request.JSON(fiber.Map{"client_id": os.Getenv("GITHUB_OAUTH_CLIENT_ID"), "client_secret": os.Getenv("GITHUB_OAUTH_CLIENT_SECRET"), "code": code, "redirect_uri": os.Getenv("GITHUB_OAUTH_CALLBACK_URL")})
+	request := fiber.
+		Post("https://github.com/login/oauth/access_token").
+		Debug().
+		Set("Accept", "application/json").
+		Set("Content-Type", "application/json").
+		JSON(fiber.Map{"client_id": os.Getenv("GITHUB_OAUTH_CLIENT_ID"), "client_secret": os.Getenv("GITHUB_OAUTH_CLIENT_SECRET"), "code": code, "redirect_uri": os.Getenv("GITHUB_OAUTH_CALLBACK_URL")})
 	stcode, body, errs := request.Bytes()
 	// Check for errors
 	if errs != nil {
@@ -65,9 +66,12 @@ func GithubCallback(c *fiber.Ctx) error {
 	json.Unmarshal(body, &auth_resp)
 
 	// get user id from github
-	request = fiber.Get("https://api.github.com/user")
-	request.Debug()
-	request.Set("Accept", "application/json").Set("Content-Type", "application/json").Set("Authorization", "Bearer "+auth_resp.AccessToken)
+	request = fiber.
+		Get("https://api.github.com/user").
+		Debug().
+		Set("Accept", "application/json").
+		Set("Content-Type", "application/json").
+		Set("Authorization", "Bearer "+auth_resp.AccessToken)
 	statusCode, body, errs := request.Bytes()
 	// Check for errors
 	if errs != nil {
@@ -89,8 +93,8 @@ func GithubCallback(c *fiber.Ctx) error {
 	token_record := new(models.AccessTokenRecord)
 	token_record.User = user
 	h := sha256.New()
-	h.Write([]byte(auth_resp.AccessToken))   // hash access_token
-	token_record.AcessTokenHash = h.Sum(nil) // save hash to database
+	h.Write([]byte(auth_resp.AccessToken))
+	token_record.AcessTokenHash = h.Sum(nil)
 	token_record.Created_time = time.Now()
 	// Save the token to the mongo database
 	tokensCollection := configs.GetCollection(configs.DB, "tokens")
