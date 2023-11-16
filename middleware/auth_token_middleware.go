@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"general/fiber-swagger/configs"
 	"general/fiber-swagger/models"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
@@ -18,13 +19,11 @@ func AuthTokenMiddleware() func(*fiber.Ctx) error {
 	config := keyauth.Config{
 		AuthScheme: "Bearer",
 		Validator: func(c *fiber.Ctx, key string) (bool, error) {
-
+			user := ""
 			// make hash from key
 			h := sha256.New()
 			h.Write([]byte(key))
 			access_token_hash := h.Sum(nil)
-			user := ""
-
 			// get hash key from db
 			tokensCollection := configs.GetCollection(configs.DB, "tokens")
 			cached_token := tokensCollection.FindOne(c.Context(), bson.M{"access_token_hash": access_token_hash})
@@ -39,7 +38,7 @@ func AuthTokenMiddleware() func(*fiber.Ctx) error {
 				}
 			}
 
-			// get user id from github and save to db
+			// if token is not in db, get user id from github and save to db
 			request := fiber.Get("https://api.github.com/user")
 			request.Debug()
 			request.Set("Accept", "application/json").Set("Content-Type", "application/json").Set("Authorization", "Bearer "+key)
@@ -54,6 +53,9 @@ func AuthTokenMiddleware() func(*fiber.Ctx) error {
 				json_resp := make(map[string]interface{})
 				json.Unmarshal(body, &json_resp)
 				user = json_resp["login"].(string)
+				token_record.User = user
+				token_record.AcessTokenHash = access_token_hash
+				token_record.Created_time = time.Now()
 				fiberlog.Debug(user)
 				if user != "" {
 					_, err := tokensCollection.InsertOne(c.Context(), token_record)
