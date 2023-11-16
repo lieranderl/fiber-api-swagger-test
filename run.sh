@@ -1,0 +1,1 @@
+gofmt -s -w . && swag fmt && swag init -o docs/v1 && go run main.go
